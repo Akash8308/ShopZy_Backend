@@ -1,48 +1,32 @@
 package com.shopzy.shopzy.model;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+
+@Getter
+@Setter
+@NoArgsConstructor
+@Entity
+@Table(name = "order_item")
 public class OrderItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
-    private long order_id;
-    private long product_id;
-    private long quantity;
-    private float price_at_purchase;
 
-    public long getOrder_id() {
-        return order_id;
-    }
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "order_id")
+    private Order order;
 
-    public void setOrder_id(long order_id) {
-        this.order_id = order_id;
-    }
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    private Product product;
 
-    public long getProduct_id() {
-        return product_id;
-    }
-
-    public void setProduct_id(long product_id) {
-        this.product_id = product_id;
-    }
-
-    public long getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(long quantity) {
-        this.quantity = quantity;
-    }
-
-    public float getPrice_at_purchase() {
-        return price_at_purchase;
-    }
-
-    public void setPrice_at_purchase(float price_at_purchase) {
-        this.price_at_purchase = price_at_purchase;
-    }
+    private int quantity;
+    private float priceAtPurchase;
 }

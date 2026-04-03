@@ -1,4 +1,4 @@
-package com.shopzy.shopzy.model;
+package com.shopzy.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;

@@ -1,4 +1,4 @@
-package com.shopzy.shopzy.model;
+package com.shopzy.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;

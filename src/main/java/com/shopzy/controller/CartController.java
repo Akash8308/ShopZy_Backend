@@ -14,4 +14,8 @@ public class CartController {
         this.cartService = cartService;
     }
 
+    public CartItem addItemToCart(CartItem cartItem){
+        return this.cartService.addItemToCart(cartItem);
+    }
+
 }

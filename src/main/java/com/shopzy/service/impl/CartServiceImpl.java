@@ -27,7 +27,7 @@ public class CartServiceImpl implements CartService {
     @Override
     public void clearCart(Long cartId) {
         Cart cart = cartRepository.findById(cartId).orElseThrow();
-        cart.getItems().clear();
+        cart.getCartItems().clear();
         cartRepository.save(cart);
     }
 }

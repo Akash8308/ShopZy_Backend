@@ -1,39 +1,39 @@
 package com.shopzy.controller;
 
 import com.shopzy.model.CartItem;
-import com.shopzy.service.impl.CartServiceImpl;
+import com.shopzy.service.CartItemService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/cart-items")
-public class CartitemController {
+public class CartItemController {
 
-    private final CartServiceImpl cartServiceImpl;
+    private final CartItemService cartItemService;
 
-    public CartitemController(CartServiceImpl cartServiceImpl) {
-        this.cartServiceImpl = cartServiceImpl;
+    public CartItemController(CartItemService cartItemService) {
+        this.cartItemService = cartItemService;
     }
 
     @PostMapping
     public CartItem addItem(@RequestBody CartItem cartItem) {
-        return cartServiceImpl.addItemToCart(cartItem);
+        return cartItemService.addItemToCart(cartItem);
     }
 
     @GetMapping
     public List<CartItem> getAllItems() {
-        return cartServiceImpl.getAllCartItems();
+        return cartItemService.getAllCartItems();
     }
 
     @PutMapping("/{id}")
     public CartItem updateItem(@PathVariable Long id, @RequestBody CartItem cartItem) {
-        return cartServiceImpl.updateCartItem(id, cartItem);
+        return cartItemService.updateCartItem(id, cartItem);
     }
 
     @DeleteMapping("/{id}")
     public String deleteItem(@PathVariable Long id) {
-        cartServiceImpl.deleteCartItem(id);
+        cartItemService.deleteCartItem(id);
         return "Item removed from cart";
     }
 }

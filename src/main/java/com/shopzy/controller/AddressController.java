@@ -25,7 +25,7 @@ public class AddressController {
 
     @PostMapping
     public Address create(@RequestBody Address address) {
-        return addressServiceImpl.addAddress(address);
+        return addressServiceImpl.createAddress(address);
     }
 
 }

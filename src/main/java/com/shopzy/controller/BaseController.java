@@ -1,16 +1,13 @@
 package com.shopzy.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/")
 public class BaseController {
 
-    @GetMapping
+    @GetMapping("/")  // maps root URL
     public String home() {
-        return "Hello from ShopZy!";
+        return "Welcome to ShopZy!";
     }
 }
-

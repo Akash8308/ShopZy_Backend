@@ -1,7 +1,7 @@
-package com.shopzy.shopzy.model;
+package com.shopzy.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.shopzy.shopzy.valueobject.OrderStatus;
+import com.shopzy.valueobject.OrderStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

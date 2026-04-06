@@ -1,18 +1,9 @@
 package com.shopzy.service;
 
-import com.shopzy.model.CartItem;
-import com.shopzy.repository.CartRepository;
-import org.springframework.stereotype.Service;
+import com.shopzy.model.Cart;
 
-@Service
-public class CartService {
-    private CartRepository cartRepository;
-
-    public CartService(CartRepository cartRepository){
-        this.cartRepository = cartRepository;
-    }
-
-    public CartItem addItemToCart(CartItem cartItem){
-        return this.cartRepository.save(cartItem);
-    }
+public interface CartService {
+    Cart getCartByUser(Long userId);
+    Cart createCart(Cart cart);
+    void clearCart(Long cartId);
 }

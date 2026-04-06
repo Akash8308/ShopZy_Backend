@@ -1,7 +1,7 @@
 package com.shopzy.controller;
 
 import com.shopzy.model.Category;
-import com.shopzy.service.CategoryService;
+import com.shopzy.service.impl.CategoryServiceImpl;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,35 +10,35 @@ import java.util.List;
 @RequestMapping("/categories")
 public class CategoryController {
 
-    private final CategoryService categoryService;
+    private final CategoryServiceImpl categoryServiceImpl;
 
-    public CategoryController(CategoryService categoryService) {
-        this.categoryService = categoryService;
+    public CategoryController(CategoryServiceImpl categoryServiceImpl) {
+        this.categoryServiceImpl = categoryServiceImpl;
     }
 
     @PostMapping
     public Category createCategory(@RequestBody Category category) {
-        return categoryService.createCategory(category);
+        return categoryServiceImpl.createCategory(category);
     }
 
     @GetMapping
     public List<Category> getAllCategories() {
-        return categoryService.getAllCategories();
+        return categoryServiceImpl.getAllCategories();
     }
 
     @GetMapping("/{id}")
     public Category getCategoryById(@PathVariable Long id) {
-        return categoryService.getCategoryById(id);
+        return categoryServiceImpl.getCategoryById(id);
     }
 
     @PutMapping("/{id}")
     public Category updateCategory(@PathVariable Long id, @RequestBody Category category) {
-        return categoryService.updateCategory(id, category);
+        return categoryServiceImpl.updateCategory(id, category);
     }
 
     @DeleteMapping("/{id}")
     public String deleteCategory(@PathVariable Long id) {
-        categoryService.deleteCategory(id);
+        categoryServiceImpl.deleteCategory(id);
         return "Category deleted successfully";
     }
 }

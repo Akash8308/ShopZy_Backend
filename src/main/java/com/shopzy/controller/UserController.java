@@ -1,7 +1,7 @@
 package com.shopzy.controller;
 
 import com.shopzy.model.User;
-import com.shopzy.service.UserService;
+import com.shopzy.service.impl.UserServiceImpl;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,40 +10,40 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
 
-    private final UserService userService;
+    private final UserServiceImpl userServiceImpl;
 
-    public UserController(UserService userService) {
-        this.userService = userService;
+    public UserController(UserServiceImpl userServiceImpl) {
+        this.userServiceImpl = userServiceImpl;
     }
 
     @PostMapping
     public User createUser(@RequestBody User user) {
-        return userService.createUser(user);
+        return userServiceImpl.createUser(user);
     }
 
     @GetMapping
     public List<User> getAllUsers() {
-        return userService.getAllUsers();
+        return userServiceImpl.getAllUsers();
     }
 
     @GetMapping("/{id}")
     public User getUserById(@PathVariable Long id) {
-        return userService.getUserById(id);
+        return userServiceImpl.getUserById(id);
     }
 
     @GetMapping("/email")
     public User getUserByEmail(@RequestParam String email) {
-        return userService.getUserByEmail(email);
+        return userServiceImpl.getUserByEmail(email);
     }
 
     @PutMapping("/{id}")
     public User updateUser(@PathVariable Long id, @RequestBody User user) {
-        return userService.updateUser(id, user);
+        return userServiceImpl.updateUser(id, user);
     }
 
     @DeleteMapping("/{id}")
     public String deleteUser(@PathVariable Long id) {
-        userService.deleteUser(id);
+        userServiceImpl.deleteUser(id);
         return "User deleted successfully";
     }
 }

@@ -1,7 +1,13 @@
 package com.shopzy.service;
 
-import org.springframework.stereotype.Service;
+import com.shopzy.model.User;
+import java.util.List;
 
-@Service
-public class UserService {
+public interface UserService {
+    User createUser(User user);
+    List<User> getAllUsers();
+    User getUserById(Long id);
+    User getUserByEmail(String email);
+    User updateUser(Long id, User user);
+    void deleteUser(Long id);
 }

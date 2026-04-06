@@ -1,7 +1,7 @@
 package com.shopzy.controller;
 
 import com.shopzy.model.Address;
-import com.shopzy.service.AddressService;
+import com.shopzy.service.impl.AddressServiceImpl;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,20 +12,20 @@ import java.util.List;
 @Controller
 public class AddressController {
 
-    private final AddressService addressService;
+    private final AddressServiceImpl addressServiceImpl;
 
-    public AddressController(AddressService addressService){
-        this.addressService = addressService;
+    public AddressController(AddressServiceImpl addressServiceImpl){
+        this.addressServiceImpl = addressServiceImpl;
     }
 
     @GetMapping
     public List<Address> getAll(){
-        return addressService.getAllAddresses();
+        return addressServiceImpl.getAllAddresses();
     }
 
     @PostMapping
     public Address create(@RequestBody Address address) {
-        return addressService.addAddress(address);
+        return addressServiceImpl.addAddress(address);
     }
 
 }

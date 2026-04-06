@@ -1,7 +1,12 @@
 package com.shopzy.service;
 
-import org.springframework.stereotype.Service;
+import com.shopzy.model.CartItem;
+import java.util.List;
 
-@Service
-public class CartItemService {
+public interface CartItemService {
+    CartItem addItemToCart(CartItem cartItem);
+    List<CartItem> getAllCartItems();
+    List<CartItem> getCartItemsByUser(Long userId);
+    CartItem updateCartItem(Long id, CartItem cartItem);
+    void deleteCartItem(Long id);
 }

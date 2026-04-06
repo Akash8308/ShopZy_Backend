@@ -1,7 +1,12 @@
 package com.shopzy.service;
 
-import org.springframework.stereotype.Service;
+import com.shopzy.model.Category;
+import java.util.List;
 
-@Service
-public class CategoryService {
+public interface CategoryService {
+    Category createCategory(Category category);
+    List<Category> getAllCategories();
+    Category getCategoryById(Long id);
+    Category updateCategory(Long id, Category category);
+    void deleteCategory(Long id);
 }

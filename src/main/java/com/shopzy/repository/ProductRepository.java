@@ -2,8 +2,10 @@ package com.shopzy.repository;
 
 import com.shopzy.model.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
-@Repository
+import java.util.List;
+
 public interface ProductRepository extends JpaRepository<Product, Long> {
+    List<Product> findByCategoryId(Long categoryId);
+    List<Product> findByNameContainingIgnoreCase(String keyword);
 }

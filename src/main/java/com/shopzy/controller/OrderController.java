@@ -1,7 +1,7 @@
 package com.shopzy.controller;
 
 import com.shopzy.model.Order;
-import com.shopzy.service.OrderService;
+import com.shopzy.service.impl.OrderServiceImpl;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,40 +10,40 @@ import java.util.List;
 @RequestMapping("/orders")
 public class OrderController {
 
-    private final OrderService orderService;
+    private final OrderServiceImpl orderServiceImpl;
 
-    public OrderController(OrderService orderService) {
-        this.orderService = orderService;
+    public OrderController(OrderServiceImpl orderServiceImpl) {
+        this.orderServiceImpl = orderServiceImpl;
     }
 
     @PostMapping
     public Order placeOrder(@RequestBody Order order) {
-        return orderService.placeOrder(order);
+        return orderServiceImpl.placeOrder(order);
     }
 
     @GetMapping
     public List<Order> getAllOrders() {
-        return orderService.getAllOrders();
+        return orderServiceImpl.getAllOrders();
     }
 
     @GetMapping("/{id}")
     public Order getOrderById(@PathVariable Long id) {
-        return orderService.getOrderById(id);
+        return orderServiceImpl.getOrderById(id);
     }
 
     @GetMapping("/user/{userId}")
     public List<Order> getOrdersByUser(@PathVariable Long userId) {
-        return orderService.getOrdersByUser(userId);
+        return orderServiceImpl.getOrdersByUser(userId);
     }
 
     @PutMapping("/{id}")
     public Order updateOrder(@PathVariable Long id, @RequestBody Order order) {
-        return orderService.updateOrder(id, order);
+        return orderServiceImpl.updateOrder(id, order);
     }
 
     @DeleteMapping("/{id}")
     public String deleteOrder(@PathVariable Long id) {
-        orderService.deleteOrder(id);
+        orderServiceImpl.deleteOrder(id);
         return "Order deleted successfully";
     }
 }

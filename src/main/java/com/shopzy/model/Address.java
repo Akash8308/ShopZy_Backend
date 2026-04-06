@@ -1,4 +1,4 @@
-package com.shopzy.shopzy.model;
+package com.shopzy.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -6,27 +6,25 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
 @Getter
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "order_item")
-public class OrderItem {
+@Table(name = "addresses")
+public class Address {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String street;
+    private String city;
+    private String state;
+    private String zipCode;
+    private String country;
 
     @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "order_id")
-    private Order order;
-
-    @ManyToOne
-    @JoinColumn(name = "product_id")
-    private Product product;
-
-    private int quantity;
-    private float priceAtPurchase;
+    @JoinColumn(name = "user_id")
+    private User user;
 }

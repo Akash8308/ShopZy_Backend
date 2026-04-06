@@ -1,4 +1,4 @@
-package com.shopzy.shopzy.valueobject;
+package com.shopzy.valueobject;
 
 public enum OrderStatus {
     PENDING,

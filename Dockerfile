@@ -12,7 +12,7 @@ RUN mvn clean package -DskipTests
 
 
 # Stage 2: Run (FIXED)
-FROM eclipse-temurin-21-jdk
+FROM eclipse-temurin:21-jdk
 
 WORKDIR /app
 

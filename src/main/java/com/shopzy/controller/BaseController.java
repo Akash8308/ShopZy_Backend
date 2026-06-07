@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class BaseController {
 
-    @GetMapping("/")  // maps root URL
+    @GetMapping("/home")  // maps root URL
     public String home() {
         return "Welcome to ShopZy!";
     }

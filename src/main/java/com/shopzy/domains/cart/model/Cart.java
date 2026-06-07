@@ -2,12 +2,12 @@ package com.shopzy.domains.cart.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
+@Data
+@AllArgsConstructor
 @Getter
 @Setter
 @NoArgsConstructor

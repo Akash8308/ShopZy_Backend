@@ -2,9 +2,7 @@ package com.shopzy.domains.user.model;
 
 import com.shopzy.shared.valueobject.Role;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -14,6 +12,8 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
+@Data
+@AllArgsConstructor
 @Getter
 @Setter
 @NoArgsConstructor

@@ -3,13 +3,13 @@ package com.shopzy.domains.order.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.shopzy.shared.valueobject.OrderStatus;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Data
+@AllArgsConstructor
 @Getter
 @Setter
 @NoArgsConstructor

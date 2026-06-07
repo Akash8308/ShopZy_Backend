@@ -26,7 +26,7 @@ import io.jsonwebtoken.Jwts;
 @Service
 public class JwtService extends SimpleUrlAuthenticationSuccessHandler {
 
-    @Value("$jwt.secret")
+    @Value("${jwt.secret}")
     private String secretKey;
 
     @Autowired

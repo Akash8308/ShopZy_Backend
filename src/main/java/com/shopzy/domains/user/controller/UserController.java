@@ -1,6 +1,6 @@
 package com.shopzy.domains.user.controller;
 
-import com.shopzy.domains.user.model.User;
+import com.shopzy.domains.user.model.Users;
 import com.shopzy.domains.user.service.impl.UserServiceImpl;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,33 +17,27 @@ public class UserController {
     }
 
     @PostMapping
-    public User createUser(@RequestBody User user) {
+    public Users createUser(@RequestBody Users user) {
         return userServiceImpl.createUser(user);
     }
 
     @GetMapping
-    public List<User> getAllUsers() {
+    public List<Users> getAllUsers() {
         return userServiceImpl.getAllUsers();
     }
 
     @GetMapping("/{id}")
-    public User getUserById(@PathVariable Long id) {
+    public Users getUserById(@PathVariable Long id) {
         return userServiceImpl.getUserById(id);
     }
 
     @GetMapping("/email")
-    public User getUserByEmail(@RequestParam String email) {
+    public Users getUserByEmail(@RequestParam String email) {
         return userServiceImpl.getUserByEmail(email);
     }
 
     @PutMapping("/{id}")
-    public User updateUser(@PathVariable Long id, @RequestBody User user) {
+    public Users updateUser(@PathVariable Long id, @RequestBody Users user) {
         return userServiceImpl.updateUser(id, user);
-    }
-
-    @DeleteMapping("/{id}")
-    public String deleteUser(@PathVariable Long id) {
-        userServiceImpl.deleteUser(id);
-        return "User deleted successfully";
     }
 }

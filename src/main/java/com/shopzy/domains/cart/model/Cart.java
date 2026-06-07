@@ -22,7 +22,7 @@ public class Cart {
     @JsonIgnore
     @OneToOne
     @JoinColumn(name = "user_id")
-    private com.shopzy.domains.user.model.User user;
+    private com.shopzy.domains.user.model.Users user;
 
     @JsonIgnore
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)

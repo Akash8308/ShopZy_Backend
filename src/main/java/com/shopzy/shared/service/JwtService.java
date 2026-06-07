@@ -26,7 +26,7 @@ import io.jsonwebtoken.Jwts;
 @Service
 public class JwtService extends SimpleUrlAuthenticationSuccessHandler {
 
-    @Value("$jwt.secret")
+    @Value("${jwt.secret}")
     private String secretKey;
 
     @Autowired
@@ -58,6 +58,7 @@ public class JwtService extends SimpleUrlAuthenticationSuccessHandler {
     }
 
     private Key getSecreteKey() {
+        System.out.println("JWT Secret: [" + secretKey + "]");
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }

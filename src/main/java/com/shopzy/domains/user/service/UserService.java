@@ -1,13 +1,14 @@
 package com.shopzy.domains.user.service;
 
-import com.shopzy.domains.user.model.User;
+import com.shopzy.domains.user.model.Users;
+
 import java.util.List;
 
 public interface UserService {
-    User createUser(User user);
-    List<User> getAllUsers();
-    User getUserById(Long id);
-    User getUserByEmail(String email);
-    User updateUser(Long id, User user);
+    Users createUser(Users user);
+    List<Users> getAllUsers();
+    Users getUserById(Long id);
+    Users getUserByEmail(String email);
+    Users updateUser(Long id, Users user);
     void deleteUser(Long id);
 }

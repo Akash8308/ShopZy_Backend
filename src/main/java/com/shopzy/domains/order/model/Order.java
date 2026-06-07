@@ -27,7 +27,7 @@ public class Order {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private com.shopzy.domains.user.model.User user;
+    private com.shopzy.domains.user.model.Users user;
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status;

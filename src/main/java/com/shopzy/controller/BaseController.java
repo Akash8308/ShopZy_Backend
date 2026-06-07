@@ -1,6 +1,6 @@
 package com.shopzy.controller;
 
-import com.shopzy.domains.user.model.User;
+import com.shopzy.domains.user.model.Users;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,7 +15,7 @@ public class BaseController {
     }
 
     @PostMapping
-    public String login(@RequestBody User user) {
+    public String login(@RequestBody Users user) {
 
     }
 }

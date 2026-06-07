@@ -1,11 +1,11 @@
 package com.shopzy.domains.user.repository;
 
-import com.shopzy.domains.user.model.User;
+import com.shopzy.domains.user.model.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface UserRepository extends JpaRepository<User, Long> {
-    Optional<User> findByEmail(String email);
+public interface UserRepository extends JpaRepository<Users, Long> {
+    Optional<Users> findByEmail(String email);
     public Users findByUsername(String username);
 }

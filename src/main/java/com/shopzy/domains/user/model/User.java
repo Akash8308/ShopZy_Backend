@@ -20,6 +20,7 @@ public class User {
     private Long id;
 
     private String name;
+    private String Username;
     private String email;
     private String password;
     private String role;

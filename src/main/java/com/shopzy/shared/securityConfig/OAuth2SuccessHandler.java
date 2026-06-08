@@ -12,6 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @Component
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
@@ -44,6 +45,13 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 });
 
         String token = jwtService.generateToken(user);
-        response.sendRedirect("/home");
+
+        String url = ServletUriComponentsBuilder
+                .fromCurrentContextPath()
+                .path("/home")
+                .toUriString();
+
+        response.sendRedirect(url);
+//        response.sendRedirect("/home");
     }
 }

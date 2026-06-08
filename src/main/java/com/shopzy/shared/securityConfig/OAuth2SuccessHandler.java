@@ -46,12 +46,12 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         String token = jwtService.generateToken(user);
 
-        String url = ServletUriComponentsBuilder
-                .fromCurrentContextPath()
-                .path("/home")
-                .toUriString();
-
-        response.sendRedirect(url);
-//        response.sendRedirect("/home");
+//        String url = ServletUriComponentsBuilder
+//                .fromCurrentContextPath()
+//                .path("/home")
+//                .toUriString();
+//
+//        response.sendRedirect(url);
+        response.sendRedirect("https://shopzy-rouge.vercel.app/");
     }
 }

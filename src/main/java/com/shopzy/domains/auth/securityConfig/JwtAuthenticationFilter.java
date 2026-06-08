@@ -1,7 +1,7 @@
-package com.shopzy.shared.securityConfig;
+package com.shopzy.domains.auth.securityConfig;
 
 
-import com.shopzy.shared.service.JwtService;
+import com.shopzy.domains.auth.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

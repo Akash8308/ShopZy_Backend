@@ -1,11 +1,14 @@
-package com.shopzy.shared.service;
+package com.shopzy.domains.auth.service;
 
+import com.shopzy.domains.auth.dto.RegisterRequest;
 import com.shopzy.domains.user.model.Users;
-import com.shopzy.shared.dto.AuthResponse;
+import com.shopzy.domains.auth.dto.AuthResponse;
+import com.shopzy.domains.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -14,7 +17,13 @@ public class AuthService {
     private AuthenticationManager authenticationManager;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private JwtService jwtService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public AuthResponse verify(Users user) {
 
@@ -28,7 +37,7 @@ public class AuthService {
 
         if(authentication.isAuthenticated()) {
 
-            String accessToken = jwtService.generateToken(user);
+            String accessToken = jwtService.generateAccessToken(user);
             String refreshToken = jwtService.generateRefreshToken();
 
             return new AuthResponse(
@@ -41,6 +50,24 @@ public class AuthService {
         }
 
         throw new RuntimeException("Invalid credentials");
+    }
+
+    public void register(RegisterRequest request) {
+
+        if (userService.existsByEmail(request.email())) {
+            throw new RuntimeException("Email already registered");
+        }
+
+        Users user = new Users();
+
+        user.setName(request.name());
+        user.setEmail(request.email());
+
+        user.setPassword(
+                passwordEncoder.encode(request.password())
+        );
+
+        userService.createUser(user);
     }
 }
 

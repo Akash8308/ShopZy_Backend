@@ -2,15 +2,9 @@ package com.shopzy.domains.user.service.impl;
 
 import com.shopzy.domains.user.model.Users;
 import com.shopzy.domains.user.repository.UserRepository;
-import com.shopzy.domains.user.service.UserService;
-import com.shopzy.shared.dto.AuthResponse;
-import com.shopzy.shared.service.JwtService;
+import com.shopzy.domains.auth.service.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

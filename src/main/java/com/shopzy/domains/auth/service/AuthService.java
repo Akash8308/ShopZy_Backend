@@ -37,7 +37,10 @@ public class AuthService {
 
         if(authentication.isAuthenticated()) {
 
-            String accessToken = jwtService.generateAccessToken(user);
+            Users authenticatedUser =
+                    (Users) authentication.getPrincipal();
+
+            String accessToken = jwtService.generateAccessToken(authenticatedUser);
             String refreshToken = jwtService.generateRefreshToken();
 
             return new AuthResponse(

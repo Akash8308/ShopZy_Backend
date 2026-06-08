@@ -1,4 +1,4 @@
-package com.shopzy.model;
+package com.shopzy.domains.auth.model;
 
 import com.shopzy.domains.user.model.Users;
 import jakarta.persistence.*;

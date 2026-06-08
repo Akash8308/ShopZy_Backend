@@ -1,8 +1,8 @@
-package com.shopzy.shared.securityConfig;
+package com.shopzy.domains.auth.securityConfig;
 
 import com.shopzy.domains.user.model.Users;
 import com.shopzy.domains.user.repository.UserRepository;
-import com.shopzy.shared.service.JwtService;
+import com.shopzy.domains.auth.service.JwtService;
 
 import java.io.IOException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -48,8 +48,13 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                     return userRepository.save(newUser);
                 });
 
-        String token = jwtService.generateToken(user);
+        String token = jwtService.generateAccessToken(user);
 
-        response.sendRedirect(frontendUrl);
+        String url = ServletUriComponentsBuilder
+                .fromCurrentContextPath()
+                .path("/home")
+                .toUriString();
+
+        response.sendRedirect(frontendUrl + "/?token=" + token);
     }
 }

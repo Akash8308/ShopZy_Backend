@@ -1,19 +1,13 @@
-package com.shopzy.shared.service;
+package com.shopzy.domains.auth.service;
 
 import com.shopzy.domains.user.model.Users;
 import com.shopzy.domains.user.repository.UserRepository;
-import com.shopzy.shared.securityConfig.OAuth2SuccessHandler;
 import com.shopzy.shared.valueobject.Role;
 import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.io.IOException;
 import io.jsonwebtoken.security.Keys;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +26,7 @@ public class JwtService extends SimpleUrlAuthenticationSuccessHandler {
     @Autowired
     private UserRepository userRepository;
 
-    public String generateToken(Users user) {
+    public String generateAccessToken(Users user) {
         Map<String, Object> claims = new HashMap<>();
 
         return Jwts.builder()

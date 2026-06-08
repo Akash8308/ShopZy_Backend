@@ -55,9 +55,9 @@ public class AuthService {
                 return new AuthResponse(
                         accessToken,
                         refreshToken,
-                        user.getId(),
-                        user.getEmail(),
-                        user.getRole().toString()
+                        authenticatedUser.getId(),
+                        authenticatedUser.getEmail(),
+                        authenticatedUser.getRole().toString()
                 );
             }
         } catch (Exception e) {

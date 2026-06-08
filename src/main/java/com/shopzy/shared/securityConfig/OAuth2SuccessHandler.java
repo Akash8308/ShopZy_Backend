@@ -44,13 +44,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 });
 
         String token = jwtService.generateToken(user);
-
-//        response.sendRedirect(
-//                "http://localhost:3000/oauth-success?token=" + token
-//        );
-
-        response.sendRedirect(
-                "http://localhost:8080/home"
-        );
+        response.sendRedirect("/home");
     }
 }

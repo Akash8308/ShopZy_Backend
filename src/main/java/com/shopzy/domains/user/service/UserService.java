@@ -12,4 +12,5 @@ public interface UserService {
     Users getUserById(Long id);
     Users getUserByEmail(String email);
     Users updateUser(Long id, Users user);
+    boolean existsByEmail(String email);
 }

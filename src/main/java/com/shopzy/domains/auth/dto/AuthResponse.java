@@ -1,4 +1,4 @@
-package com.shopzy.shared.dto;
+package com.shopzy.domains.auth.dto;
 
 public record AuthResponse(
         String accessToken,

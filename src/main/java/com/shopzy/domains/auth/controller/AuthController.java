@@ -6,11 +6,13 @@ import com.shopzy.domains.auth.dto.RegisterRequest;
 import com.shopzy.domains.auth.service.AuthService;
 import com.shopzy.domains.user.model.Users;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -22,6 +24,8 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(
             @RequestBody LoginRequest request) {
+
+        log.info("Login request received for email: {}", request.getEmail());
 
         Users user = new Users();
         user.setEmail(request.getEmail());

@@ -4,6 +4,7 @@ import com.shopzy.domains.auth.dto.RegisterRequest;
 import com.shopzy.domains.user.model.Users;
 import com.shopzy.domains.auth.dto.AuthResponse;
 import com.shopzy.domains.user.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -11,6 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class AuthService {
     @Autowired
@@ -27,30 +29,44 @@ public class AuthService {
 
     public AuthResponse verify(Users user) {
 
-        Authentication authentication =
-                authenticationManager.authenticate(
-                        new UsernamePasswordAuthenticationToken(
-                                user.getEmail(),
-                                user.getPassword()
-                        )
+        try {
+
+            Authentication authentication =
+                    authenticationManager.authenticate(
+                            new UsernamePasswordAuthenticationToken(
+                                    user.getEmail(),
+                                    user.getPassword()
+                            )
+                    );
+
+            log.info("Authentication successful");
+
+            if(authentication.isAuthenticated()) {
+
+                log.info("Generating JWT for {}",
+                        user.getEmail());
+
+                Users authenticatedUser =
+                        (Users) authentication.getPrincipal();
+
+                String accessToken = jwtService.generateAccessToken(authenticatedUser);
+                String refreshToken = jwtService.generateRefreshToken();
+
+                return new AuthResponse(
+                        accessToken,
+                        refreshToken,
+                        user.getId(),
+                        user.getEmail(),
+                        user.getRole().toString()
                 );
+            }
+        } catch (Exception e) {
 
-        if(authentication.isAuthenticated()) {
+            log.error("Authentication failed", e);
 
-            Users authenticatedUser =
-                    (Users) authentication.getPrincipal();
-
-            String accessToken = jwtService.generateAccessToken(authenticatedUser);
-            String refreshToken = jwtService.generateRefreshToken();
-
-            return new AuthResponse(
-                    accessToken,
-                    refreshToken,
-                    user.getId(),
-                    user.getEmail(),
-                    user.getRole().toString()
-            );
+            throw e;
         }
+
 
         throw new RuntimeException("Invalid credentials");
     }

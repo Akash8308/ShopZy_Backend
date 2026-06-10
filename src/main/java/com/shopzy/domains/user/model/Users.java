@@ -26,7 +26,7 @@ public class Users implements UserDetails {
 
     private String name;
 
-    private String Username;
+    private String username;
 
     @Column(unique = true)
     private String email;
@@ -54,6 +54,11 @@ public class Users implements UserDetails {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<com.shopzy.domains.order.model.Order> orders;
+
+    public Users(String username, String email) {
+        this.username = username;
+        this.email = email;
+    }
 
     @PrePersist
     protected void onCreate() {

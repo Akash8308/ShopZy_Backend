@@ -1,5 +1,6 @@
 package com.shopzy.domains.user.model;
 
+import com.shopzy.domains.auth.model.RefreshToken;
 import com.shopzy.shared.valueobject.Role;
 import jakarta.persistence.*;
 import lombok.*;
@@ -9,6 +10,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -40,10 +42,6 @@ public class Users implements UserDetails {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    //Security
-    private String refreshToken;
-    private LocalDateTime refreshTokenExpiry;
-
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Address> addresses;
 
@@ -52,6 +50,9 @@ public class Users implements UserDetails {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<com.shopzy.domains.order.model.Order> orders;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RefreshToken> refreshTokens = new ArrayList<>();
 
     public Users(String username, String email) {
         this.username = username;

@@ -41,7 +41,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                     Users newUser = new Users();
                     newUser.setUsername(oauthUser.getAttribute("username"));
                     newUser.setEmail(oauthUser.getAttribute("email"));
-                    newUser.setRefreshToken(oauthUser.getAttribute("refreshToken"));
                     return userRepository.save(newUser);
                 });
 

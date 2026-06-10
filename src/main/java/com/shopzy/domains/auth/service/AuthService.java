@@ -12,6 +12,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+
 @Slf4j
 @Service
 public class AuthService {
@@ -77,13 +79,14 @@ public class AuthService {
             throw new RuntimeException("Email already registered");
         }
 
-        Users user = new Users(request.username(), request.email());
+        Users user = new Users(request.username(), request.email().toLowerCase());
 
         user.setPassword(
                 passwordEncoder.encode(request.password())
         );
 
         userService.createUser(user);
+
     }
 }
 

@@ -52,9 +52,9 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         String url = ServletUriComponentsBuilder
                 .fromCurrentContextPath()
-                .path("/home")
+                .path("/dashboard")
                 .toUriString();
 
-        response.sendRedirect(frontendUrl + "/?token=" + token);
+        response.sendRedirect(frontendUrl + "/dashboard" + "/?token=" + token);
     }
 }

@@ -36,13 +36,11 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         OAuth2User oauthUser = (OAuth2User) authentication.getPrincipal();
 
-        // Create user if not exists
         Users user = userRepository.findByEmail(oauthUser.getAttribute("email"))
                 .orElseGet(() -> {
                     Users newUser = new Users();
-                    newUser.setName(oauthUser.getAttribute("username"));
+                    newUser.setUsername(oauthUser.getAttribute("username"));
                     newUser.setEmail(oauthUser.getAttribute("email"));
-                    newUser.setName(oauthUser.getAttribute("name"));
                     newUser.setRefreshToken(oauthUser.getAttribute("refreshToken"));
                     return userRepository.save(newUser);
                 });

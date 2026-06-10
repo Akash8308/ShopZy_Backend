@@ -34,7 +34,7 @@ public class AuthService {
             Authentication authentication =
                     authenticationManager.authenticate(
                             new UsernamePasswordAuthenticationToken(
-                                    user.getEmail(),
+                                    user.getEmail().toLowerCase(),
                                     user.getPassword()
                             )
                     );
@@ -77,10 +77,7 @@ public class AuthService {
             throw new RuntimeException("Email already registered");
         }
 
-        Users user = new Users();
-
-        user.setName(request.name());
-        user.setEmail(request.email());
+        Users user = new Users(request.username(), request.email());
 
         user.setPassword(
                 passwordEncoder.encode(request.password())

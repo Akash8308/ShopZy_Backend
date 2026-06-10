@@ -1,6 +1,8 @@
 package com.shopzy.domains.auth.service;
 
+import com.shopzy.domains.auth.Repository.RefreshTokenRepository;
 import com.shopzy.domains.auth.dto.RegisterRequest;
+import com.shopzy.domains.auth.model.RefreshToken;
 import com.shopzy.domains.user.model.Users;
 import com.shopzy.domains.auth.dto.AuthResponse;
 import com.shopzy.domains.user.service.UserService;
@@ -12,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Slf4j
@@ -28,6 +31,9 @@ public class AuthService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private RefreshTokenRepository refreshTokenRepository;
 
     public AuthResponse verify(Users user) {
 
@@ -85,8 +91,16 @@ public class AuthService {
                 passwordEncoder.encode(request.password())
         );
 
-        userService.createUser(user);
+        if ( userService.createUser(user) != null ) {
+            log.info("User registered successfully");
 
+            generateRefreshToken(user);
+
+        }
+    }
+
+    public void generateRefreshToken(Users user) {
+        refreshTokenRepository.save(new RefreshToken(jwtService.generateRefreshToken(), user, LocalDateTime.now().plusDays(7)));
     }
 }
 

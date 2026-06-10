@@ -1,6 +1,9 @@
 package com.shopzy.domains.user.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.shopzy.domains.auth.model.RefreshToken;
+import com.shopzy.domains.cart.model.Cart;
+import com.shopzy.domains.order.model.Order;
 import com.shopzy.shared.valueobject.Role;
 import jakarta.persistence.*;
 import lombok.*;
@@ -14,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-@Data
 @AllArgsConstructor
 @Getter
 @Setter
@@ -43,14 +45,15 @@ public class Users implements UserDetails {
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Address> addresses;
+    private List<Address> addresses = new ArrayList<>();
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private com.shopzy.domains.cart.model.Cart cart;
+    private Cart cart;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<com.shopzy.domains.order.model.Order> orders;
+    private List<Order> orders = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RefreshToken> refreshTokens = new ArrayList<>();
 
@@ -74,7 +77,7 @@ public class Users implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(
-                new SimpleGrantedAuthority("ROLE_" + Role.USER)
+                new SimpleGrantedAuthority("ROLE_" + role.name())
         );
     }
 
@@ -95,6 +98,6 @@ public class Users implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return UserDetails.super.isEnabled();
+        return enabled;
     }
 }

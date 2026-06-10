@@ -4,6 +4,7 @@ import com.shopzy.domains.user.model.Users;
 import jakarta.persistence.*;
 
         import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
 @Table(name = "refresh_tokens")
@@ -14,13 +15,13 @@ public class RefreshToken {
     private Long id;
 
     @Column(nullable = false, unique = true, length = 512)
-    private String token;
+    private String refreshToken;
 
     @Column(nullable = false)
     private LocalDateTime expiresAt;
 
     @Column(nullable = false)
-    private boolean revoked = false;
+    private boolean revoked;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
@@ -29,10 +30,11 @@ public class RefreshToken {
     @JoinColumn(name = "user_id", nullable = false)
     private Users user;
 
-    @PrePersist
-    public void prePersist() {
-        createdAt = LocalDateTime.now();
+    public RefreshToken(String refreshToken, Users user, LocalDateTime expiresAt) {
+        this.refreshToken = refreshToken;
+        this.user = user;
+        this.expiresAt = expiresAt;
+        this.createdAt = LocalDateTime.now();
+        this.revoked = false;
     }
-
-    // getters/setters
 }

@@ -36,24 +36,18 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         OAuth2User oauthUser = (OAuth2User) authentication.getPrincipal();
 
-        String email = oauthUser.getAttribute("email");
-        String name = oauthUser.getAttribute("name");
-
         // Create user if not exists
-        Users user = userRepository.findByEmail(email)
+        Users user = userRepository.findByEmail(oauthUser.getAttribute("email"))
                 .orElseGet(() -> {
                     Users newUser = new Users();
-                    newUser.setEmail(email);
-                    newUser.setName(name);
+                    newUser.setName(oauthUser.getAttribute("username"));
+                    newUser.setEmail(oauthUser.getAttribute("email"));
+                    newUser.setName(oauthUser.getAttribute("name"));
+                    newUser.setRefreshToken(oauthUser.getAttribute("refreshToken"));
                     return userRepository.save(newUser);
                 });
 
         String token = jwtService.generateAccessToken(user);
-
-        String url = ServletUriComponentsBuilder
-                .fromCurrentContextPath()
-                .path("/dashboard")
-                .toUriString();
 
         response.sendRedirect(frontendUrl + "/dashboard" + "/?token=" + token);
     }

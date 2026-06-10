@@ -55,6 +55,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 .path("/home")
                 .toUriString();
 
-        response.sendRedirect(frontendUrl + "/home" + "/?token=" + token);
+        response.sendRedirect(frontendUrl + "/?token=" + token);
     }
 }

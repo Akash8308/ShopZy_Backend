@@ -67,6 +67,7 @@ public class Users implements UserDetails {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
         role = Role.USER;
+        enabled  = true;
     }
 
     @PreUpdate

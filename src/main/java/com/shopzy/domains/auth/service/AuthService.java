@@ -1,13 +1,15 @@
 package com.shopzy.domains.auth.service;
 
 import com.shopzy.domains.auth.Repository.RefreshTokenRepository;
+import com.shopzy.domains.auth.dto.AuthResponse;
 import com.shopzy.domains.auth.dto.RegisterRequest;
+import com.shopzy.domains.auth.dto.RegisterResponse;
+import com.shopzy.domains.auth.dto.RegisterUserResponse;
 import com.shopzy.domains.auth.model.RefreshToken;
 import com.shopzy.domains.user.model.Users;
-import com.shopzy.domains.auth.dto.AuthResponse;
 import com.shopzy.domains.user.service.UserService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -15,92 +17,108 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class AuthService {
-    @Autowired
-    private AuthenticationManager authenticationManager;
 
-    @Autowired
-    private UserService userService;
+    private final AuthenticationManager authenticationManager;
+    private final UserService userService;
+    private final JwtService jwtService;
+    private final PasswordEncoder passwordEncoder;
+    private final RefreshTokenRepository refreshTokenRepository;
 
-    @Autowired
-    private JwtService jwtService;
+    public AuthResponse verify(Users loginRequest) {
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+        Authentication authentication = authenticate(
+                loginRequest.getEmail(),
+                loginRequest.getPassword()
+        );
 
-    @Autowired
-    private RefreshTokenRepository refreshTokenRepository;
+        Users authenticatedUser =
+                (Users) authentication.getPrincipal();
 
-    public AuthResponse verify(Users user) {
-
-        try {
-
-            Authentication authentication =
-                    authenticationManager.authenticate(
-                            new UsernamePasswordAuthenticationToken(
-                                    user.getEmail().toLowerCase(),
-                                    user.getPassword()
-                            )
-                    );
-
-            log.info("Authentication successful");
-
-            if(authentication.isAuthenticated()) {
-
-                log.info("Generating JWT for {}",
-                        user.getEmail());
-
-                Users authenticatedUser =
-                        (Users) authentication.getPrincipal();
-
-                String accessToken = jwtService.generateAccessToken(authenticatedUser);
-                String refreshToken = jwtService.generateRefreshToken();
-
-                return new AuthResponse(
-                        accessToken,
-                        refreshToken,
-                        authenticatedUser.getId(),
-                        authenticatedUser.getEmail(),
-                        authenticatedUser.getRole().toString()
-                );
-            }
-        } catch (Exception e) {
-
-            log.error("Authentication failed", e);
-
-            throw e;
-        }
-
-
-        throw new RuntimeException("Invalid credentials");
+        return buildAuthResponse(authenticatedUser);
     }
 
-    public void register(RegisterRequest request) {
+    public RegisterResponse register(RegisterRequest request) {
 
         if (userService.existsByEmail(request.email())) {
             throw new RuntimeException("Email already registered");
         }
 
-        Users user = new Users(request.username(), request.email().toLowerCase());
+        Users user = new Users(
+                request.username(),
+                request.email().toLowerCase()
+        );
 
         user.setPassword(
                 passwordEncoder.encode(request.password())
         );
 
-        if ( userService.createUser(user) != null ) {
-            log.info("User registered successfully");
+        Users savedUser = userService.createUser(user);
 
-            generateRefreshToken(user);
-
+        if (savedUser == null) {
+            throw new RuntimeException("Failed to register user");
         }
+
+        log.info("User registered successfully: {}", savedUser.getEmail());
+
+        AuthResponse authResponse = buildAuthResponse(savedUser);
+
+        RegisterUserResponse registerUserResponse =
+                new RegisterUserResponse(
+                        savedUser.getId(),
+                        savedUser.getUsername(),
+                        savedUser.getEmail(),
+                        savedUser.getRole().toString()
+                );
+
+        return new RegisterResponse(
+                authResponse.refreshToken(),
+                authResponse.accessToken(),
+                registerUserResponse
+        );
     }
 
-    public void generateRefreshToken(Users user) {
-        refreshTokenRepository.save(new RefreshToken(jwtService.generateRefreshToken(), user, LocalDateTime.now().plusDays(7)));
+    private Authentication authenticate(String email, String password) {
+
+        return authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        email.toLowerCase(),
+                        password
+                )
+        );
+    }
+
+    private AuthResponse buildAuthResponse(Users user) {
+
+        String accessToken =
+                jwtService.generateAccessToken(user);
+
+        RefreshToken refreshToken =
+                generateRefreshToken(user);
+
+        return new AuthResponse(
+                accessToken,
+                refreshToken.getRefreshToken(),
+                user.getId(),
+                user.getEmail(),
+                user.getRole().toString()
+        );
+    }
+
+    public RefreshToken generateRefreshToken(Users user) {
+
+        String token = jwtService.generateRefreshToken();
+
+        RefreshToken refreshToken = new RefreshToken(
+                token,
+                user,
+                LocalDateTime.now().plusDays(7)
+        );
+
+        return refreshTokenRepository.save(refreshToken);
     }
 }
-

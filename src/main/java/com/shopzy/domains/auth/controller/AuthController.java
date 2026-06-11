@@ -3,6 +3,7 @@ package com.shopzy.domains.auth.controller;
 import com.shopzy.domains.auth.dto.AuthResponse;
 import com.shopzy.domains.auth.dto.LoginRequest;
 import com.shopzy.domains.auth.dto.RegisterRequest;
+import com.shopzy.domains.auth.dto.RegisterResponse;
 import com.shopzy.domains.auth.service.AuthService;
 import com.shopzy.domains.user.model.Users;
 import lombok.RequiredArgsConstructor;
@@ -40,8 +41,8 @@ public class AuthController {
     public ResponseEntity<?> register(
             @RequestBody RegisterRequest request) {
 
-        authService.register(request);
+        RegisterResponse registerResponse = authService.register(request);
 
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(registerResponse);
     }
 }

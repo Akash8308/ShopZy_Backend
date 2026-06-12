@@ -1,21 +1,26 @@
 package com.shopzy.domains.auth.service;
 
 import com.shopzy.domains.auth.Repository.RefreshTokenRepository;
-import com.shopzy.domains.auth.dto.AuthResponse;
-import com.shopzy.domains.auth.dto.RegisterRequest;
-import com.shopzy.domains.auth.dto.RegisterResponse;
-import com.shopzy.domains.auth.dto.RegisterUserResponse;
+import com.shopzy.domains.auth.dto.*;
 import com.shopzy.domains.auth.model.RefreshToken;
 import com.shopzy.domains.user.model.Users;
 import com.shopzy.domains.user.service.UserService;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.SecretKey;
 import java.time.LocalDateTime;
 
 @Slf4j
@@ -28,6 +33,9 @@ public class AuthService {
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenRepository refreshTokenRepository;
+
+    @Value("${jwt.secret}")
+    private String secretKey;
 
     public AuthResponse verify(Users loginRequest) {
 
@@ -105,6 +113,7 @@ public class AuthService {
                 refreshToken.getRefreshToken(),
                 user.getId(),
                 user.getEmail(),
+                user.getName(),
                 user.getRole().toString()
         );
     }
@@ -120,5 +129,61 @@ public class AuthService {
         );
 
         return refreshTokenRepository.save(refreshToken);
+    }
+
+    private SecretKey getSigningKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    public AuthResponse exchange(String token) {
+        if (isTokenValid(token)){
+            Users user = extractUser(token);
+
+            if (user != null) {
+                return new AuthResponse(
+                        jwtService.generateRefreshToken(),
+                        jwtService.generateAccessToken(user),
+                        user.getId(),
+                        user.getEmail(),
+                        user.getName(),
+                        user.getRole().toString()
+
+                );
+            }
+        }
+        return null;
+    }
+
+    private Users extractUser(String token) {
+        String email = extractEmail(token);
+
+        if(email == null){
+            return userService.getUserByEmail(email);
+        }
+
+        return null;
+    }
+
+    public boolean isTokenValid(String token) {
+        try {
+            Jwts.parser()
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseClaimsJws(token);
+
+            return true;
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    public String extractEmail(String token) {
+        return Jwts.parser()
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getSubject();
     }
 }

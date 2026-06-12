@@ -29,6 +29,7 @@ public class Users implements UserDetails {
     private Long id;
 
     private String username;
+    private String name;
 
     @Column(unique = true)
     private String email;

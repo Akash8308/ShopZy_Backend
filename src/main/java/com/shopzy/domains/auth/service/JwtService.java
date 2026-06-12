@@ -30,7 +30,7 @@ public class JwtService extends SimpleUrlAuthenticationSuccessHandler {
         Map<String, Object> claims = new HashMap<>();
 
         return Jwts.builder()
-                .subject(user.getUsername())
+                .subject(user.getEmail())
                 .issuer("shpzy-api")
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + 15 * 60 * 1000))

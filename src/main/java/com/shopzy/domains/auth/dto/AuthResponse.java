@@ -5,6 +5,7 @@ public record AuthResponse(
         String refreshToken,
         Long userId,
         String email,
+        String name,
         String role
 ) {
 }

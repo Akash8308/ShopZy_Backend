@@ -34,6 +34,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             Authentication authentication)
             throws IOException {
 
+        logger.info("Authentication Success");
+
         OAuth2User oauthUser = (OAuth2User) authentication.getPrincipal();
 
         Users user = userRepository.findByEmail(oauthUser.getAttribute("email"))
@@ -45,6 +47,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 });
 
         String token = jwtService.generateAccessToken(user);
+
+        logger.info("Redirecting to" + frontendUrl + "/home" + "/?token=" + token);
 
         response.sendRedirect(frontendUrl + "/home" + "/?token=" + token);
     }

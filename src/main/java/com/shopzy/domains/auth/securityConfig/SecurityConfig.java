@@ -58,6 +58,7 @@ public class SecurityConfig {
                         "/auth/login",
                         "/auth/register",
                         "/oauth2/**",
+                        "/auth/exchange",
                         "/login/oauth2/**").permitAll().anyRequest().authenticated())
 
                 .oauth2Login(oauth ->

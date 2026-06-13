@@ -43,8 +43,8 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(registerResponse);
     }
 
-    @GetMapping("/exchange")
-    public AuthResponse exchange(String token) {
-        return authService.exchange(token);
+    @PostMapping("/exchange")
+    public AuthResponse exchangeCode(@RequestParam String code) {
+        return authService.exchange(code);
     }
 }

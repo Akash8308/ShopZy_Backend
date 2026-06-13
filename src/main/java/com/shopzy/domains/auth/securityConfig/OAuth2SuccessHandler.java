@@ -1,14 +1,19 @@
 package com.shopzy.domains.auth.securityConfig;
 
+import com.shopzy.domains.auth.dto.UserDto;
 import com.shopzy.domains.user.model.Users;
 import com.shopzy.domains.user.repository.UserRepository;
 import com.shopzy.domains.auth.service.JwtService;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.util.UUID;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -27,6 +32,9 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     @Value("${app.frontend.url}")
     private String frontendUrl;
 
+    @Autowired
+    private RedisTemplate redisTemplate;
+
     @Override
     public void onAuthenticationSuccess (
             HttpServletRequest request,
@@ -37,6 +45,14 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         logger.info("Authentication Success");
 
         OAuth2User oauthUser = (OAuth2User) authentication.getPrincipal();
+        String code = UUID.randomUUID().toString();
+        UserDto userDto = (UserDto) oauthUser.getAttribute("user");
+
+        redisTemplate.opsForValue().set(
+                "oaut:" + code,
+                userDto,
+                Duration.ofMinutes(5)
+        );
 
         Users user = userRepository.findByEmail(oauthUser.getAttribute("email"))
                 .orElseGet(() -> {
@@ -48,8 +64,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         String token = jwtService.generateAccessToken(user);
 
-        logger.info("Redirecting to" + frontendUrl + "/home" + "/?token=" + token);
-
-        response.sendRedirect(frontendUrl + "/home" + "/?token=" + token);
+        logger.info("Redirecting to: " + frontendUrl + "/home" + "/?code=" + code);
+        response.sendRedirect(frontendUrl + "/home" + "/?code=" + code);
     }
 }

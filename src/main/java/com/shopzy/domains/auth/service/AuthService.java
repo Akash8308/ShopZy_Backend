@@ -10,7 +10,9 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -33,6 +35,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     @Value("${jwt.secret}")
     private String secretKey;
@@ -108,14 +111,15 @@ public class AuthService {
         RefreshToken refreshToken =
                 generateRefreshToken(user);
 
-        return new AuthResponse(
-                accessToken,
-                refreshToken.getRefreshToken(),
-                user.getId(),
-                user.getEmail(),
-                user.getName(),
-                user.getRole().toString()
-        );
+        return AuthResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken.getRefreshToken())
+                .user(UserDto.builder()
+                        .id(user.getId())
+                        .email(user.getEmail())
+                        .name(user.getName())
+                        .role(user.getRole().toString()).build())
+                .build();
     }
 
     public RefreshToken generateRefreshToken(Users user) {
@@ -136,23 +140,22 @@ public class AuthService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public AuthResponse exchange(String token) {
-        if (isTokenValid(token)){
-            Users user = extractUser(token);
+    public AuthResponse exchange(String code) {
+        UserDto userDto = (UserDto) redisTemplate.opsForValue().get("oauth:" + code);
 
-            if (user != null) {
-                return new AuthResponse(
-                        jwtService.generateRefreshToken(),
-                        jwtService.generateAccessToken(user),
-                        user.getId(),
-                        user.getEmail(),
-                        user.getName(),
-                        user.getRole().toString()
+//        if (isTokenValid(code)){
+            Users extractedUser = extractUser(code);
 
-                );
-            }
-        }
-        return null;
+            return AuthResponse.builder()
+                    .accessToken(jwtService.generateAccessToken(extractedUser))
+                    .refreshToken(jwtService.generateRefreshToken())
+                    .user(UserDto.builder()
+                            .id(extractedUser.getId())
+                            .email(extractedUser.getEmail())
+                            .name(extractedUser.getName())
+                            .role(extractedUser.getRole().toString()).build())
+                    .build();
+//            }
     }
 
     private Users extractUser(String token) {

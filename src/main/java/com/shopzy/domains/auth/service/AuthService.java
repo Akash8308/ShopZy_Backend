@@ -143,7 +143,6 @@ public class AuthService {
     public AuthResponse exchange(String code) {
         UserDto userDto = (UserDto) redisTemplate.opsForValue().get("oauth:" + code);
 
-//        if (isTokenValid(code)){
             Users extractedUser = extractUser(code);
 
             return AuthResponse.builder()
@@ -155,7 +154,6 @@ public class AuthService {
                             .name(extractedUser.getName())
                             .role(extractedUser.getRole().toString()).build())
                     .build();
-//            }
     }
 
     private Users extractUser(String token) {

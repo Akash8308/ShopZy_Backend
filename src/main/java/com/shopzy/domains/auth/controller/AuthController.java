@@ -45,6 +45,7 @@ public class AuthController {
 
     @PostMapping("/exchange")
     public AuthResponse exchangeCode(@RequestParam String code) {
+        log.info("Exchange code request received for code: {}", code);
         return authService.exchange(code);
     }
 }

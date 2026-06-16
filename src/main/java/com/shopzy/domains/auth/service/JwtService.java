@@ -56,7 +56,16 @@ public class JwtService extends SimpleUrlAuthenticationSuccessHandler {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String extractUsername(String username) {
+    public String extractUsername(String token) {
+        String[] chunks = token.split("\\.");
+
+        Base64.Decoder decoder = Base64.getDecoder();
+
+        String header = new String(decoder.decode(chunks[0]));
+        String payload = new String(decoder.decode(chunks[1]));
+
+        System.out.println("Header: " + header);
+        System.out.println("Payload: " + payload);
         return "";
     }
 

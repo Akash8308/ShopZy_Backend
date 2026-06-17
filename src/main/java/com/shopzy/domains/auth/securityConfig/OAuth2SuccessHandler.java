@@ -14,11 +14,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import tools.jackson.databind.ObjectMapper;
 
 @Component
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
@@ -33,7 +35,10 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private String frontendUrl;
 
     @Autowired
-    private RedisTemplate redisTemplate;
+    private StringRedisTemplate stringRedisTemplate;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Override
     public void onAuthenticationSuccess (
@@ -48,13 +53,15 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String code = UUID.randomUUID().toString();
         UserDto userDto = (UserDto) oauthUser.getAttribute("user");
 
-        redisTemplate.opsForValue().set(
-                "oaut:" + code,
-                userDto,
+        String json = objectMapper.writeValueAsString(userDto);
+
+        stringRedisTemplate.opsForValue().set(
+                "oauth:" + code,
+                json,
                 Duration.ofMinutes(5)
         );
 
-        logger.info( redisTemplate.opsForValue().get("oauth:" + code));
+        logger.info( stringRedisTemplate.opsForValue().get("oauth:" + code));
 
         Users user = userRepository.findByEmail(oauthUser.getAttribute("email"))
                 .orElseGet(() -> {

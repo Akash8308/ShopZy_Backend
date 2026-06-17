@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,6 +22,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.ObjectMapper;
 
 import javax.crypto.SecretKey;
 import java.time.LocalDateTime;
@@ -35,7 +37,11 @@ public class AuthService {
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenRepository refreshTokenRepository;
-    private final RedisTemplate<String, Object> redisTemplate;
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Value("${jwt.secret}")
     private String secretKey;
@@ -141,9 +147,13 @@ public class AuthService {
     }
 
     public AuthResponse exchange(String code) {
-        UserDto userDto = (UserDto) redisTemplate.opsForValue().get("oauth:" + code);
+        String json = stringRedisTemplate.opsForValue().get("oauth:" + code);
 
-            Users extractedUser = extractUser(code);
+        UserDto userDto = objectMapper.readValue(json, UserDto.class);
+
+
+        if(userDto != null) {
+            Users extractedUser = userService.getUserByEmail(userDto.getEmail());
 
             return AuthResponse.builder()
                     .accessToken(jwtService.generateAccessToken(extractedUser))
@@ -154,6 +164,8 @@ public class AuthService {
                             .name(extractedUser.getName())
                             .role(extractedUser.getRole().toString()).build())
                     .build();
+            }
+        return null;
     }
 
     private Users extractUser(String token) {

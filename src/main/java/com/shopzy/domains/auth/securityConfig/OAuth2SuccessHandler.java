@@ -54,6 +54,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 Duration.ofMinutes(5)
         );
 
+        logger.info( redisTemplate.opsForValue().get("oauth:" + code));
+
         Users user = userRepository.findByEmail(oauthUser.getAttribute("email"))
                 .orElseGet(() -> {
                     Users newUser = new Users();

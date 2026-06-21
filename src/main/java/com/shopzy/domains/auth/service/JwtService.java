@@ -1,5 +1,7 @@
 package com.shopzy.domains.auth.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.shopzy.domains.auth.dto.JwtPayloadDto;
 import com.shopzy.domains.user.model.Users;
 import com.shopzy.domains.user.repository.UserRepository;
 import com.shopzy.shared.valueobject.Role;
@@ -16,6 +18,8 @@ import java.security.SecureRandom;
 import java.util.*;
 
 import io.jsonwebtoken.Jwts;
+//import tools.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class JwtService extends SimpleUrlAuthenticationSuccessHandler {
@@ -25,6 +29,8 @@ public class JwtService extends SimpleUrlAuthenticationSuccessHandler {
 
     @Autowired
     private UserRepository userRepository;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public String generateAccessToken(Users user) {
         Map<String, Object> claims = new HashMap<>();
@@ -56,22 +62,21 @@ public class JwtService extends SimpleUrlAuthenticationSuccessHandler {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String extractEmail(String token) {
+    public String extractEmail(String token) throws JsonProcessingException {
         String[] chunks = token.split("\\.");
 
         Base64.Decoder decoder = Base64.getDecoder();
 
         String header = new String(decoder.decode(chunks[0]));
-        String payload = new String(decoder.decode(chunks[1]));
+        String claims = new String(decoder.decode(chunks[1]));
 
-        System.out.println("Header: " + header);
-        System.out.println("Payload: " + payload);
-        return "";
+        JwtPayloadDto payload = objectMapper.readValue(claims, JwtPayloadDto.class);
+        return payload.getSub();
     }
 
-    public boolean validateToken(String token,
-                                 UserDetails userDetails) {
+    public boolean validateToken(String token, UserDetails userDetails) throws JsonProcessingException {
 
+        logger.info("Update validation: Currently validating by username");
         String username = extractEmail(token);
 
         return username.equals(userDetails.getUsername())

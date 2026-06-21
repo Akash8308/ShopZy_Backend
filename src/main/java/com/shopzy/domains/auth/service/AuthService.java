@@ -37,7 +37,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenRepository refreshTokenRepository;
-    
+
     @Autowired
     private RedisTemplate redisTemplate;
 
@@ -149,13 +149,10 @@ public class AuthService {
 
     public AuthResponse exchange(String code) {
         String json = redisTemplate.opsForValue().get("oauth:" + code).toString();
-
-        log.info("redisCache code: " + json.toString() + " code: " + code);
-
         UserDto userDto = objectMapper.readValue(json, UserDto.class);
 
+        if(userDto != null && userDto.getUuid().equals(code)) {
 
-        if(userDto != null) {
             Users extractedUser = userService.getUserByEmail(userDto.getEmail());
 
             return AuthResponse.builder()
@@ -168,7 +165,9 @@ public class AuthService {
                             .role(extractedUser.getRole().toString()).build())
                     .build();
             }
-        return null;
+        else
+            return null;
+//        return null;
     }
 
     private Users extractUser(String token) {

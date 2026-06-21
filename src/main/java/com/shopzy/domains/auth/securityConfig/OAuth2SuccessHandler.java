@@ -55,6 +55,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         UserDto userDto = UserDto.builder()
                 .email(oauthUser.getAttribute("email"))
                 .name(oauthUser.getAttribute("name"))
+                .uuid(code)
                 .build();
 
         logger.info("userDto = {}" + userDto);

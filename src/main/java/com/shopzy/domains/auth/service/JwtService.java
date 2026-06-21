@@ -56,7 +56,7 @@ public class JwtService extends SimpleUrlAuthenticationSuccessHandler {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String extractUsername(String token) {
+    public String extractEmail(String token) {
         String[] chunks = token.split("\\.");
 
         Base64.Decoder decoder = Base64.getDecoder();
@@ -72,7 +72,7 @@ public class JwtService extends SimpleUrlAuthenticationSuccessHandler {
     public boolean validateToken(String token,
                                  UserDetails userDetails) {
 
-        String username = extractUsername(token);
+        String username = extractEmail(token);
 
         return username.equals(userDetails.getUsername())
                 && !isTokenExpired(token);

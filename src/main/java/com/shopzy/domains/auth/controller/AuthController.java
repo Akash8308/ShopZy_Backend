@@ -25,9 +25,10 @@ public class AuthController {
 
         log.info("Login request received for email: {}", request.getEmail());
 
-        Users user = new Users();
-        user.setEmail(request.getEmail());
-        user.setPassword(request.getPassword());
+        Users user = Users.builder()
+                .email(request.getEmail())
+                .password(request.getPassword())
+                .build();
 
         return ResponseEntity.ok(
                 authService.verify(user)
@@ -45,7 +46,6 @@ public class AuthController {
 
     @PostMapping("/exchange")
     public AuthResponse exchangeCode(@RequestParam String code) {
-        log.info("Exchange code request received for code: {}", code);
         return authService.exchange(code);
     }
 }

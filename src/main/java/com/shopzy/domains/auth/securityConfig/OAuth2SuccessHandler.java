@@ -35,7 +35,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private String frontendUrl;
 
     @Autowired
-    private StringRedisTemplate stringRedisTemplate;
+    private RedisTemplate<String, Object> redisTemplate;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -51,17 +51,24 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         OAuth2User oauthUser = (OAuth2User) authentication.getPrincipal();
         String code = UUID.randomUUID().toString();
-        UserDto userDto = (UserDto) oauthUser.getAttribute("user");
+
+        UserDto userDto = UserDto.builder()
+                .email(oauthUser.getAttribute("email"))
+                .name(oauthUser.getAttribute("name"))
+                .build();
+
+        logger.info("userDto = {}" + userDto);
+        logger.info("oauthUser attributes = {}" + oauthUser.getAttributes());
 
         String json = objectMapper.writeValueAsString(userDto);
 
-        stringRedisTemplate.opsForValue().set(
+        redisTemplate.opsForValue().set(
                 "oauth:" + code,
                 json,
                 Duration.ofMinutes(5)
         );
 
-        logger.info( stringRedisTemplate.opsForValue().get("oauth:" + code));
+        logger.info( "Stored: " + redisTemplate.opsForValue().get("oauth:" + code));
 
         Users user = userRepository.findByEmail(oauthUser.getAttribute("email"))
                 .orElseGet(() -> {
@@ -70,8 +77,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                     newUser.setEmail(oauthUser.getAttribute("email"));
                     return userRepository.save(newUser);
                 });
-
-        String token = jwtService.generateAccessToken(user);
 
         logger.info("Redirecting to: " + frontendUrl + "/home" + "/?code=" + code);
         response.sendRedirect(frontendUrl + "/home" + "/?code=" + code);

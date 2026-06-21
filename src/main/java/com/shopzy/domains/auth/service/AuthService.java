@@ -37,8 +37,9 @@ public class AuthService {
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenRepository refreshTokenRepository;
+    
     @Autowired
-    private StringRedisTemplate stringRedisTemplate;
+    private RedisTemplate redisTemplate;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -147,7 +148,9 @@ public class AuthService {
     }
 
     public AuthResponse exchange(String code) {
-        String json = stringRedisTemplate.opsForValue().get("oauth:" + code);
+        String json = redisTemplate.opsForValue().get("oauth:" + code).toString();
+
+        log.info("redisCache code: " + json.toString() + " code: " + code);
 
         UserDto userDto = objectMapper.readValue(json, UserDto.class);
 

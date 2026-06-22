@@ -58,9 +58,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 .uuid(code)
                 .build();
 
-        logger.info("userDto = {}" + userDto);
-        logger.info("oauthUser attributes = {}" + oauthUser.getAttributes());
-
         String json = objectMapper.writeValueAsString(userDto);
 
         redisTemplate.opsForValue().set(
@@ -74,12 +71,13 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         Users user = userRepository.findByEmail(oauthUser.getAttribute("email"))
                 .orElseGet(() -> {
                     Users newUser = new Users();
-                    newUser.setUsername(oauthUser.getAttribute("username"));
+                    newUser.setUsername(oauthUser.getAttribute("name"));
+                    newUser.setName(oauthUser.getAttribute("given_name"));
                     newUser.setEmail(oauthUser.getAttribute("email"));
                     return userRepository.save(newUser);
                 });
 
-        logger.info("Redirecting to: " + frontendUrl + "/home" + "/?code=" + code);
-        response.sendRedirect(frontendUrl + "/home" + "/?code=" + code);
+        logger.info("Redirecting to: " + frontendUrl + "/callback" + "/?code=" + code);
+        response.sendRedirect(frontendUrl + "/callback" + "/?code=" + code);
     }
 }

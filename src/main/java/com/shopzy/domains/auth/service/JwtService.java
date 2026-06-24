@@ -1,15 +1,17 @@
 package com.shopzy.domains.auth.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.shopzy.domains.auth.dto.JwtPayloadDto;
 import com.shopzy.domains.user.model.Users;
 import com.shopzy.domains.user.repository.UserRepository;
 import com.shopzy.shared.valueobject.Role;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Service;
 
@@ -17,10 +19,11 @@ import java.security.Key;
 import java.security.SecureRandom;
 import java.util.*;
 
-import io.jsonwebtoken.Jwts;
-//import tools.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import javax.crypto.SecretKey;
+
+@Slf4j
 @Service
 public class JwtService extends SimpleUrlAuthenticationSuccessHandler {
 
@@ -62,25 +65,54 @@ public class JwtService extends SimpleUrlAuthenticationSuccessHandler {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String extractEmail(String token) throws JsonProcessingException {
-        String[] chunks = token.split("\\.");
+//    public String extractEmail(String token) throws JsonProcessingException {
+//        String[] chunks = token.split("\\.");
+//
+//        Base64.Decoder decoder = Base64.getDecoder();
+//
+//        String header = new String(decoder.decode(chunks[0]));
+//        String claims = new String(decoder.decode(chunks[1]));
+//
+//        JwtPayloadDto payload = objectMapper.readValue(claims, JwtPayloadDto.class);
+//        return payload.getSub();
+//    }
 
-        Base64.Decoder decoder = Base64.getDecoder();
+    public boolean validateToken(String token, UserDetails userDetails) {
 
-        String header = new String(decoder.decode(chunks[0]));
-        String claims = new String(decoder.decode(chunks[1]));
+        try {
+            Claims claims = extractAllClaims(token);
 
-        JwtPayloadDto payload = objectMapper.readValue(claims, JwtPayloadDto.class);
-        return payload.getSub();
+            String email = claims.getSubject();
+
+            return email != null
+                    && email.equals(userDetails.getUsername())
+                    && !isTokenExpired(claims);
+
+        } catch (JwtException | IllegalArgumentException e) {
+            log.warn("JWT validation failed: {}", e.getMessage());
+            return false;
+        }
     }
 
-    public boolean validateToken(String token, UserDetails userDetails) throws JsonProcessingException {
+    public String extractEmail(String token) {
+        return extractAllClaims(token).getSubject();
+    }
 
-        logger.info("Update validation: Currently validating by username");
-        String username = extractEmail(token);
+    private boolean isTokenExpired(Claims claims) {
+        return claims.getExpiration().before(new Date());
+    }
 
-        return username.equals(userDetails.getUsername())
-                && !isTokenExpired(token);
+    private Claims extractAllClaims(String token) {
+        return Jwts.parser()
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+    }
+
+    private SecretKey getSigningKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 
     private boolean isTokenExpired(String token) {

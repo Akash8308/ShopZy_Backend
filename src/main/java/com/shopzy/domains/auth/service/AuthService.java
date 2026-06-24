@@ -16,6 +16,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
@@ -26,6 +27,7 @@ import tools.jackson.databind.ObjectMapper;
 
 import javax.crypto.SecretKey;
 import java.time.LocalDateTime;
+import java.util.Base64;
 
 @Slf4j
 @Service
@@ -54,10 +56,14 @@ public class AuthService {
                 loginRequest.getPassword()
         );
 
-        Users authenticatedUser =
-                (Users) authentication.getPrincipal();
+        if(authentication.isAuthenticated()) {
+            Users authenticatedUser =
+                    (Users) authentication.getPrincipal();
 
-        return buildAuthResponse(authenticatedUser);
+            return buildAuthResponse(authenticatedUser);
+        }
+        else
+            throw new BadCredentialsException("Invalid email or password");
     }
 
     public RegisterResponse register(RegisterRequest request) {
@@ -115,12 +121,11 @@ public class AuthService {
         String accessToken =
                 jwtService.generateAccessToken(user);
 
-        RefreshToken refreshToken =
-                generateRefreshToken(user);
+//        String acc
 
         return AuthResponse.builder()
                 .accessToken(accessToken)
-                .refreshToken(refreshToken.getRefreshToken())
+//                .refreshToken(refreshToken.getRefreshToken())
                 .user(UserDto.builder()
                         .id(user.getId())
                         .email(user.getEmail())
@@ -141,6 +146,11 @@ public class AuthService {
 
         return refreshTokenRepository.save(refreshToken);
     }
+
+    public byte[] decodeRefreshToken(String token) {
+        return Base64.getUrlDecoder().decode(token);
+    }
+
 
     private SecretKey getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);

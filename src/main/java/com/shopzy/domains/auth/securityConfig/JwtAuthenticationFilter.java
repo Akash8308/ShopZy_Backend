@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -33,6 +33,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private ApplicationContext applicationContext;
 
+    @Autowired
+    private CustomUserDetailsService customUserDetailsService;
+
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException{
 
@@ -43,27 +46,42 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String email = null;
         String token = null;
 
-       if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+        if (authorizationHeader != null &&
+                authorizationHeader.startsWith("Bearer ")) {
+
             token = authorizationHeader.substring(7);
 
             try {
                 email = jwtService.extractEmail(token);
-            } catch (JwtException e) {
-                filterChain.doFilter(httpServletRequest, httpServletResponse);
-                return;
+
+                if (email != null &&
+                        SecurityContextHolder.getContext().getAuthentication() == null) {
+
+                    UserDetails userDetail =
+                            customUserDetailsService.loadUserByUsername(email);
+
+                    if (jwtService.validateToken(token, userDetail)) {
+
+                        UsernamePasswordAuthenticationToken authentication =
+                                new UsernamePasswordAuthenticationToken(
+                                        userDetail,
+                                        null,
+                                        userDetail.getAuthorities());
+
+                        authentication.setDetails(
+                                new WebAuthenticationDetailsSource()
+                                        .buildDetails(httpServletRequest));
+
+                        SecurityContextHolder.getContext()
+                                .setAuthentication(authentication);
+                    }
+                }
+
+            } catch (JwtException | UsernameNotFoundException e) {
+                log.warn("JWT validation failed: {}", e.getMessage());
             }
-
         }
 
-        if( email != null && SecurityContextHolder.getContext().getAuthentication() == null ) {
-            UserDetails userdetails = applicationContext.getBean(CustomUserDetailsService.class).loadUserByEmail(email);
-            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-                    userdetails, null, userdetails.getAuthorities());
-
-            usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
-            SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-
-        }
         filterChain.doFilter(httpServletRequest, httpServletResponse);
     }
 }

@@ -25,13 +25,13 @@ public class AuthController {
 
         log.info("Login request received for email: {}", request.getEmail());
 
-        Users user = Users.builder()
-                .email(request.getEmail())
-                .password(request.getPassword())
-                .build();
-
         return ResponseEntity.ok(
-                authService.verify(user)
+                authService.verify(
+                         Users.builder()
+                        .email(request.getEmail())
+                        .password(request.getPassword())
+                        .build()
+                )
         );
     }
 

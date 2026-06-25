@@ -1,5 +1,7 @@
 package com.shopzy.domains.auth.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.shopzy.domains.auth.dto.JwtPayloadDto;
 import com.shopzy.domains.user.model.Users;
 import com.shopzy.domains.user.repository.UserRepository;
 import com.shopzy.shared.valueobject.Role;
@@ -65,17 +67,17 @@ public class JwtService extends SimpleUrlAuthenticationSuccessHandler {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-//    public String extractEmail(String token) throws JsonProcessingException {
-//        String[] chunks = token.split("\\.");
-//
-//        Base64.Decoder decoder = Base64.getDecoder();
-//
-//        String header = new String(decoder.decode(chunks[0]));
-//        String claims = new String(decoder.decode(chunks[1]));
-//
-//        JwtPayloadDto payload = objectMapper.readValue(claims, JwtPayloadDto.class);
-//        return payload.getSub();
-//    }
+    public String extractEmail(String token) throws JsonProcessingException {
+        String[] chunks = token.split("\\.");
+
+        Base64.Decoder decoder = Base64.getDecoder();
+
+        String header = new String(decoder.decode(chunks[0]));
+        String claims = new String(decoder.decode(chunks[1]));
+
+        JwtPayloadDto payload = objectMapper.readValue(claims, JwtPayloadDto.class);
+        return payload.getSub();
+    }
 
     public boolean validateToken(String token, UserDetails userDetails) {
 
@@ -94,9 +96,9 @@ public class JwtService extends SimpleUrlAuthenticationSuccessHandler {
         }
     }
 
-    public String extractEmail(String token) {
-        return extractAllClaims(token).getSubject();
-    }
+//    public String extractEmail(String token) {
+//        return extractAllClaims(token).getSubject();
+//    }
 
     private boolean isTokenExpired(Claims claims) {
         return claims.getExpiration().before(new Date());

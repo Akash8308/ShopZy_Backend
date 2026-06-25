@@ -13,13 +13,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Service;
@@ -74,6 +71,8 @@ public class AuthService {
 
         Users user = new Users(
                 request.username(),
+                request.firstName(),
+                request.lastName(),
                 request.email().toLowerCase()
         );
 
@@ -129,7 +128,8 @@ public class AuthService {
                 .user(UserDto.builder()
                         .id(user.getId())
                         .email(user.getEmail())
-                        .name(user.getName())
+                        .firstName(user.getFirstName())
+                        .lastName(user.getLastName())
                         .role(user.getRole().toString()).build())
                 .build();
     }
@@ -161,7 +161,11 @@ public class AuthService {
         String json = redisTemplate.opsForValue().get("oauth:" + code).toString();
         UserDto userDto = objectMapper.readValue(json, UserDto.class);
 
-        if(userDto != null && userDto.getUuid().equals(code)) {
+        if(userDto != null ) {
+
+            if(!userDto.getUuid().equals(code)){
+                throw new JwtException("Invalid code");
+            }
 
             Users extractedUser = userService.getUserByEmail(userDto.getEmail());
 
@@ -171,7 +175,8 @@ public class AuthService {
                     .user(UserDto.builder()
                             .id(extractedUser.getId())
                             .email(extractedUser.getEmail())
-                            .name(extractedUser.getName())
+                            .firstName(extractedUser.getFirstName())
+                            .lastName(extractedUser.getLastName())
                             .role(extractedUser.getRole().toString()).build())
                     .build();
             }

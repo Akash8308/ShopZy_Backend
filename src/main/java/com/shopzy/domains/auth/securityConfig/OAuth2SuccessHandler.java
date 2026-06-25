@@ -54,7 +54,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         UserDto userDto = UserDto.builder()
                 .email(oauthUser.getAttribute("email"))
-                .name(oauthUser.getAttribute("name"))
                 .uuid(code)
                 .build();
 
@@ -72,7 +71,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 .orElseGet(() -> {
                     Users newUser = new Users();
                     newUser.setUsername(oauthUser.getAttribute("name"));
-                    newUser.setName(oauthUser.getAttribute("given_name"));
+                    newUser.setFirstName((oauthUser.getAttribute("given_name")));
+                    newUser.setLastName((oauthUser.getAttribute("family_name")));
                     newUser.setEmail(oauthUser.getAttribute("email"));
                     return userRepository.save(newUser);
                 });

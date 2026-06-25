@@ -30,7 +30,8 @@ public class Users implements UserDetails {
     private Long id;
 
     private String username;
-    private String name;
+    private String firstName;
+    private String lastName;
 
     @Column(unique = true)
     private String email;
@@ -59,8 +60,10 @@ public class Users implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RefreshToken> refreshTokens = new ArrayList<>();
 
-    public Users(String username, String email) {
+    public Users(String username, String firstName, String lastName, String email) {
         this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.email = email;
     }
 
